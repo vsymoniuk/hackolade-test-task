@@ -1,10 +1,13 @@
 class JSONSchemaGenerator {
-    create(columns, tableName) {
+    create(columns, tableName, keysOfSerializedData) {
+        this.keysOfSerializedData = keysOfSerializedData;
         const type = 'object';
         const title = tableName;
         const properties = {};
 
         columns.forEach(({name, type}) => {
+            this.columnName = name;
+
             properties[name] = this.convertCassandraTypeToJSONSchemaProperty(type);
         })
 
@@ -40,15 +43,18 @@ class JSONSchemaGenerator {
                 case 'timestamp':
                 case 'timeuuid':
                 case 'uuid':
-                case 'varchar':
+                case 'varchar': {
+                    if(this.keysOfSerializedData.includes(this.columnName)) {
+                        // process serialized data
+                    }
                     return {type:"string"};
+                }
 
                 default:
                     return {};
             }
         } else {
             // processing non-basic types
-            console.log(columnType);
             switch (columnType.subtype) {
                 case 'list':
                     return {

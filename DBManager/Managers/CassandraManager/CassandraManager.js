@@ -1,6 +1,7 @@
 const cassandra = require('cassandra-driver');
 const schemaGenerator = require('./JSONSchemaGenerator');
 const columnTypesMap = require('./columnTypes');
+const isJSON = require('../../../public/helpers/isJSON')
 
 class CassandraManager {
     constructor({user: username, password, host, port}) {
@@ -25,10 +26,20 @@ class CassandraManager {
         return tables.rows.map(t => t.table_name);
     }
 
+    async getSerializedDataKeys(keyspace, tableName) {
+        const query = `select * from  ${keyspace}.${tableName}  limit 1;`
+        const response = await this.client.execute(query);
+        const dataSample = response.rows[0] || {};
+
+        return Object.keys(dataSample).filter(key => isJSON(dataSample[key]))
+    }
+
     async createTableJSONSchema(keyspace, tableName) {
         const table = await this.client.metadata.getTable(keyspace, tableName);
         const columns = table.columns.map(({name, type}) => ({name, type: this.describeType(type) }));
-        const schema = this.schemaGenerator.create(columns, tableName);
+
+        const keysOfSerializedData = await this.getSerializedDataKeys(keyspace, tableName)
+        const schema = this.schemaGenerator.create(columns, tableName, keysOfSerializedData);
         return schema;
     }
 
