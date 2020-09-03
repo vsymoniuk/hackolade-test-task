@@ -1,24 +1,27 @@
-const cassandra = require('cassandra-driver');
+const DBManager = require('./DBManager/DBManager');
 const config = require('./config');
 
-const credentials = { username: config.user, password: config.password };
-const contactPoints = [ config.host ];
-const localDataCenter = 'dc1';
-const protocolOptions = { port: config.port };
-const client = new cassandra.Client({contactPoints, protocolOptions, localDataCenter, credentials});
-
 const keyspace = 'videodb';
+const dbManager = new DBManager('cassandra', config).create();
 
-client.connect().then(async () => {
+dbManager.connect()
+.then(async () => {
     console.log('Connected');
 
-    const tables = await client.execute(`SELECT * FROM system_schema.tables WHERE keyspace_name = '${keyspace}'`);
-    const tableNames = tables.rows.map(t => t.table_name);
-    console.log(tableNames);
+    const tableNames = await dbManager.getKeyspaceTableNames(keyspace);
+    
+    for (const tableName of tableNames) {
+        const tableSchema = await dbManager.getKeyspaceTableSchema(keyspace, tableName);
+        console.log('NEW TABLE Table', tableSchema.name);
+        tableSchema.columns.forEach((column) => {
+            console.log(column);
+            console.log();
+        });
+    };
 
-    return client.shutdown();
+    dbManager.disconnect();
 })
 .catch((err) => {
     console.error('There was an error when connecting', err.message);
-    return client.shutdown();
+    dbManager.disconnect();
 })
