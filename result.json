@@ -1,0 +1,76 @@
+{
+    "schemas": [
+        {
+            "type": "object",
+            "title": "test_set",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "teams": {}
+            }
+        },
+        {
+            "type": "object",
+            "title": "video_event",
+            "properties": {
+                "event": {
+                    "type": "string"
+                },
+                "event_timestamp": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "video_timestamp": {
+                    "type": "integer"
+                },
+                "videoid": {
+                    "type": "string"
+                }
+            }
+        },
+        {
+            "type": "object",
+            "title": "video_rating",
+            "properties": {
+                "rating_counter": {
+                    "type": "integer"
+                },
+                "rating_total": {
+                    "type": "integer"
+                },
+                "videoid": {
+                    "type": "string"
+                }
+            }
+        },
+        {
+            "type": "object",
+            "title": "videos",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "location": {},
+                "tags": {},
+                "upload_date": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "videoid": {
+                    "type": "string"
+                },
+                "videoname": {
+                    "type": "string"
+                }
+            }
+        }
+    ]
+}

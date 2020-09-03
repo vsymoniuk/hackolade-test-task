@@ -1,23 +1,24 @@
+const fs = require('fs');
 const DBManager = require('./DBManager/DBManager');
 const config = require('./config');
 
-const keyspace = 'videodb';
+const dbName = 'videodb';
 const dbManager = new DBManager('cassandra', config).create();
 
 dbManager.connect()
 .then(async () => {
     console.log('Connected');
 
-    const tableNames = await dbManager.getKeyspaceTableNames(keyspace);
-    
+    const tableNames = await dbManager.getTableNames(dbName);
+    const tableJSONSchemas = []; 
+
     for (const tableName of tableNames) {
-        const tableSchema = await dbManager.getKeyspaceTableSchema(keyspace, tableName);
-        console.log('NEW TABLE Table', tableSchema.name);
-        tableSchema.columns.forEach((column) => {
-            console.log(column);
-            console.log();
-        });
+        const tableJSONSchema = await dbManager.createTableJSONSchema(dbName, tableName);
+        tableJSONSchemas.push(tableJSONSchema);
     };
+        
+    const result = JSON.stringify({schemas: tableJSONSchemas});
+    await fs.writeFile('result.json', result, 'utf8', () => console.log('Tables were success exported as JSON schemas'));
 
     dbManager.disconnect();
 })
