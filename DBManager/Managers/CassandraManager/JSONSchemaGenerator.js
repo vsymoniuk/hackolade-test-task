@@ -12,15 +12,16 @@ class JSONSchemaGenerator {
     }
 
     convertCassandraTypeToJSONSchemaProperty(columnType) {
-        if (columnType) {
+        if (typeof columnType === 'string') {
+            // processing basic types
             switch (columnType) {
                 case 'boolean':
-                    return {type:"boolean"}
+                    return {type:"boolean"};
 
                 case 'decimal':
                 case 'double':
                 case 'float':
-                    return {type:"number"}
+                    return {type:"number"};
 
                 case 'bigint':
                 case 'counter':
@@ -28,7 +29,7 @@ class JSONSchemaGenerator {
                 case 'smallint':
                 case 'tinyint':
                 case 'varint':
-                    return {type:"integer"}
+                    return {type:"integer"};
 
                 case 'ascii':
                 case 'blob':
@@ -40,14 +41,48 @@ class JSONSchemaGenerator {
                 case 'timeuuid':
                 case 'uuid':
                 case 'varchar':
-                    return {type:"string"}
+                    return {type:"string"};
 
+                default:
+                    return {};
+            }
+        } else {
+            // processing non-basic types
+            console.log(columnType);
+            switch (columnType.subtype) {
+                case 'list':
+                    return {
+                        type: 'array',
+                        items: this.convertCassandraTypeToJSONSchemaProperty(columnType.types[0]),
+                    }
+
+                case 'tuple':
+                    return {
+                        type: 'array',
+                        items: columnType.types.map(t => {
+                            return this.convertCassandraTypeToJSONSchemaProperty(t);
+                        }),
+                    };
+                    
+                case 'set':
+                    return {
+                        type: 'array',
+                        items: this.convertCassandraTypeToJSONSchemaProperty(columnType.types[0]),
+                        uniqueItems: true,
+                    }; 
+
+                case 'map':
+                    return {
+                        type: 'object',
+                        properties: {
+                            key: this.convertCassandraTypeToJSONSchemaProperty(columnType.types[0]),
+                            value: this.convertCassandraTypeToJSONSchemaProperty(columnType.types[1]),
+                        }
+                    }; 
+            
                 default:
                     return {}
             }
-        } else {
-            // work with non-basic types
-            return {}
         }
     }
 }

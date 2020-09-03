@@ -7,8 +7,6 @@ const dbManager = new DBManager('cassandra', config).create();
 
 dbManager.connect()
 .then(async () => {
-    console.log('Connected');
-
     const tableNames = await dbManager.getTableNames(dbName);
     const tableJSONSchemas = []; 
 

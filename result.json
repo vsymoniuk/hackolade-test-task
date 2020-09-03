@@ -2,6 +2,24 @@
     "schemas": [
         {
             "type": "object",
+            "title": "test_list",
+            "properties": {
+                "events": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "month": {
+                    "type": "integer"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        {
+            "type": "object",
             "title": "test_set",
             "properties": {
                 "id": {
@@ -10,7 +28,36 @@
                 "lastname": {
                     "type": "string"
                 },
-                "teams": {}
+                "teams": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true
+                }
+            }
+        },
+        {
+            "type": "object",
+            "title": "tuple_test",
+            "properties": {
+                "info": {
+                    "type": "array",
+                    "items": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "integer"
+                        }
+                    ]
+                },
+                "nation": {
+                    "type": "string"
+                }
             }
         },
         {
@@ -57,7 +104,13 @@
                     "type": "string"
                 },
                 "location": {},
-                "tags": {},
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true
+                },
                 "upload_date": {
                     "type": "string"
                 },

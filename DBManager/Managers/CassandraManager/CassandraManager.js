@@ -27,12 +27,8 @@ class CassandraManager {
 
     async createTableJSONSchema(keyspace, tableName) {
         const table = await this.client.metadata.getTable(keyspace, tableName);
-        console.log();
-        console.log();
-        // console.log(table.name);
         const columns = table.columns.map(({name, type}) => ({name, type: this.describeType(type) }));
         const schema = this.schemaGenerator.create(columns, tableName);
-        // console.log(schema);
         return schema;
     }
 
